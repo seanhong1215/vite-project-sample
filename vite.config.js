@@ -6,7 +6,7 @@ import { fileURLToPath, URL } from 'node:url';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base:'/vite-sample',
+  base:'/vite-project-sample',
   plugins: [
     vue(),
   ],
