@@ -1,1 +1,0 @@
-import{_ as e,c as r,o as t}from"./index-b1306a14.js";const n={name:"Orders",data(){return{}}};function o(s,a,c,_,d,p){return t(),r("div",null," 訂單列表 ")}const l=e(n,[["render",o]]);export{l as default};
