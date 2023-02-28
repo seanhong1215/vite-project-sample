@@ -1,7 +1,8 @@
-import { useToastMessageStore } from '../stores/toastMessage';
+import { useToastMessageStore } from '../store/toastMessage.js';
 
 export default function (response, title = '更新') {
   const toastMessageStore = useToastMessageStore();
+  console.log(response)
   if (response.data.success) {
     toastMessageStore.pushMessage({
       style: 'success',

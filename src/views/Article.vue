@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Loading :active="isLoading" :z-index="1060"></Loading>
+    <Loading :active="isLoading" :z-index="1000"></Loading>
     <div class="text-end mt-4">
       <button class="btn btn-primary" type="button" @click="openModal(true)">
         建立新的頁面
@@ -59,8 +59,8 @@
 </template>
 
 <script>
-import ArticleModal from '@/components/ArticleModal.vue';
-import DelModal from '@/components/DelModal.vue';
+import ArticleModal from "@/components/ArticleModal.vue";
+import DelModal from "@/components/DelModal.vue";
 export default {
   data() {
     return {
@@ -71,7 +71,6 @@ export default {
       currentPage: 1,
     };
   },
-  inject: ['emitter'],
   components: {
     ArticleModal,
     DelModal,
@@ -79,44 +78,48 @@ export default {
   methods: {
     getArticles(page = 1) {
       this.currentPage = page;
-      const api = `${import.meta.env.VITE_API}/api/${import.meta.env.VITE_PATH}/admin/articles?page=${page}`;
+      const api = `${import.meta.env.VITE_API}/api/${
+        import.meta.env.VITE_PATH
+      }/admin/articles?page=${page}`;
       this.isLoading = true;
-      this.$http.get(api).then((response) => {
-        this.isLoading = false;
-        if (response.data.success) {
-          this.articles = response.data.articles;
-          this.pagination = response.data.pagination;
-        }
-      }).catch((error) => {
-        // axios 的錯誤狀態，可參考：https://github.com/axios/axios#handling-errors
-        console.log('error', error.response, error.request, error.message);
-        this.isLoading = false;
-        this.emitter.emit('push-message', {
-          title: '連線錯誤',
-          style: 'danger',
-          content: error.message,
+      this.$http
+        .get(api)
+        .then((res) => {
+          this.isLoading = false;
+          if (res.data.success) {
+            this.articles = res.data.articles;
+            this.pagination = res.data.pagination;
+          }
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          this.$swal.fire({
+            icon: "error",
+            title: `連線錯誤${err.response.data.message}`,
+          });
         });
-      });
     },
     getArticle(id) {
-      const api = `${import.meta.env.VITE_API}/api/${import.meta.env.VITE_PATH}/admin/article/${id}`;
+      const api = `${import.meta.env.VITE_API}/api/${
+        import.meta.env.VITE_PATH
+      }/admin/article/${id}`;
       this.isLoading = true;
-      this.$http.get(api).then((response) => {
-        this.isLoading = false;
-        if (response.data.success) {
-          this.openModal(false, response.data.article);
-          this.isNew = false;
-        }
-      }).catch((error) => {
-        // axios 的錯誤狀態，可參考：https://github.com/axios/axios#handling-errors
-        console.log('error', error.response, error.request, error.message);
-        this.isLoading = false;
-        this.emitter.emit('push-message', {
-          title: '連線錯誤',
-          style: 'danger',
-          content: error.message,
+      this.$http
+        .get(api)
+        .then((res) => {
+          this.isLoading = false;
+          if (res.data.success) {
+            this.openModal(false, res.data.article);
+            this.isNew = false;
+          }
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          this.$swal.fire({
+            icon: "error",
+            title: `連線錯誤${err.response.data.message}`,
+          });
         });
-      });
     },
     openModal(isNew, item) {
       if (isNew) {
@@ -134,25 +137,39 @@ export default {
     },
     updateArticle(item) {
       this.tempArticle = item;
-      let api = `${import.meta.env.VITE_API}/api/${import.meta.env.VITE_PATH}/admin/article`;
-      let httpMethod = 'post';
-      let status = '新增貼文';
+      let api = `${import.meta.env.VITE_API}/api/${
+        import.meta.env.VITE_PATH
+      }/admin/article`;
+      let httpMethod = "post";
+      let status = "新增";
       this.isLoading = true;
       if (!this.isNew) {
-        api = `${import.meta.env.VITE_API}/api/${import.meta.env.VITE_PATH}/admin/article/${this.tempArticle.id}`;
-        httpMethod = 'put';
-        status = '更新貼文';
+        api = `${import.meta.env.VITE_API}/api/${
+          import.meta.env.VITE_PATH
+        }/admin/article/${this.tempArticle.id}`;
+        httpMethod = "put";
+        status = "更新";
       }
       const articleComponent = this.$refs.articleModal;
-      this.$http[httpMethod](api, { data: this.tempArticle }).then((response) => {
-        this.isLoading = false;
-        this.$httpMessageState(response, status);
-        articleComponent.hideModal();
-        this.getArticles(this.currentPage);
-      }).catch((error) => {
-        this.isLoading = false;
-        this.$httpMessageState(error.response, '錯誤訊息');
-      });
+      this.$http[httpMethod](api, { data: this.tempArticle })
+        .then((res) => {
+          this.isLoading = false;
+          this.$swal.fire({
+            icon: "success",
+            title: res.data.message,
+          });
+          articleComponent.hideModal();
+          this.getArticles(this.currentPage);
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          this.$swal
+            .fire({
+              icon: "error",
+              title: `${status}文章失敗`,
+              html: `<p class="text-danger">${err.response.data.message}</p>`,
+            });
+        });
     },
     openDelArticleModal(item) {
       this.tempArticle = { ...item };
@@ -160,18 +177,29 @@ export default {
       delComponent.openModal();
     },
     delArticle() {
-      const url = `${import.meta.env.VITE_API}/api/${import.meta.env.VITE_PATH}/admin/article/${this.tempArticle.id}`;
+      const url = `${import.meta.env.VITE_API}/api/${
+        import.meta.env.VITE_PATH
+      }/admin/article/${this.tempArticle.id}`;
       this.isLoading = true;
-      this.$http.delete(url).then((response) => {
-        this.isLoading = false;
-        this.$httpMessageState(response, '刪除貼文');
-        const delComponent = this.$refs.delModal;
-        delComponent.hideModal();
-        this.getArticles(this.currentPage);
-      }).catch((error) => {
-        this.isLoading = false;
-        this.$httpMessageState(error.response, '刪除貼文');
-      });
+      this.$http
+        .delete(url)
+        .then((res) => {
+          this.isLoading = false;
+          this.$swal.fire({
+            icon: "success",
+            title: res.data.message,
+          });
+          const delComponent = this.$refs.delModal;
+          delComponent.hideModal();
+          this.getArticles(this.currentPage);
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          this.$swal.fire({
+            icon: "error",
+            title: err.response.data.message,
+          });
+        });
     },
   },
   created() {

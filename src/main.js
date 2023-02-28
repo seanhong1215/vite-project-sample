@@ -22,6 +22,7 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 import CKEditor from '@ckeditor/ckeditor5-vue';
 import {date, currency} from '@/methods/filters.js';
+import $httpMessageState from '@/methods/pushMessageState.js';
 
 import App from './App.vue';
 import router from './router';
@@ -45,6 +46,10 @@ app.config.globalProperties.$filters = {
   date,
   currency,
 };
+
+// 正常來說不建議太多方法掛 Global，這裡可以使用 provide 來處理
+app.config.globalProperties.$httpMessageState = $httpMessageState;
+
 
 app.use(router);
 app.use(pinia);

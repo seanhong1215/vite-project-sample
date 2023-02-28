@@ -232,7 +232,6 @@ export default {
   },
   emits: ['update-product'],
   mixins: [modalMixin],
-  inject: ['emitter'],
   watch: {
     product() {
       this.tempProduct = this.product;
@@ -255,27 +254,23 @@ export default {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-      }).then((response) => {
+      }).then((res) => {
         this.status.fileUploading = false;
-        if (response.data.success) {
-          this.tempProduct.imageUrl = response.data.imageUrl;
+        if (res.data.success) {
+          this.tempProduct.imageUrl = res.data.imageUrl;
           this.$refs.fileInput.value = '';
-          this.emitter.emit('push-message', {
-            style: 'success',
+          this.$swal.fire({
+            icon: "success",
             title: '圖片上傳結果',
-            content: response.data.message,
-          });
-        } else {
-          this.$refs.fileInput.value = '';
-          this.emitter.emit('push-message', {
-            style: 'danger',
-            title: '圖片上傳結果',
-            content: response.data.message,
+            text: res.data.message,
           });
         }
-      }).catch((error) => {
+      }).catch((err) => {
         this.status.fileUploading = false;
-        this.$httpMessageState(error.response, '圖片失敗');
+        this.$swal.fire({
+            icon: "error",
+            title: `圖片失敗：${err.response.data.message}`,
+          });
       });
     },
   },

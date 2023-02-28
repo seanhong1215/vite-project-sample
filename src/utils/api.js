@@ -4,6 +4,7 @@ const baseRequest = axios.create({
   baseURL: `${import.meta.env.VITE_API}api/${import.meta.env.VITE_PATH}`,
 });
 
+
 // 全部產品列表
 export const apiGetAllProducts = () => baseRequest.get('/products/all');
 export const apiGetProducts = (page) => baseRequest.get(`/products?page=${page}`);
@@ -41,9 +42,9 @@ export const apiGetUserArticle = (id) => baseRequest.get(`/article/${id}`);
 // 產品列表
 export const apiAdminGetProducts= (page) => baseRequest.get(`/admin/products?page=${page}`);
 export const apiAdminGetProduct= () => baseRequest.get('/admin/products/all');
-export const apiAddProduct= (data) => baseRequest.post('/admin/product', data);
-export const apiUpdateProduct= (id, data) => baseRequest.put(`/admin/product/${id}`, data);
-export const apiDelProduct= (id) => baseRequest.delete(`/admin/product${id}`);
+export const apiAddProduct= (data) => baseRequest.post('/admin/product', {data: data});
+export const apiUpdateProduct= (id, data) => baseRequest.put(`/admin/product/${id}`, {data});
+export const apiDelProduct= (id) => baseRequest.delete(`/admin/product/${id}`);
 
 // 訂單列表
 export const apiGetOrders= (page) => baseRequest.get(`/admin/orders?page=${page}`);

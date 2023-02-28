@@ -1,22 +1,22 @@
 <template>
-  <Navbar/>
+  <navbar />
   <div class="container-fluid mt-3 position-relative">
-    <!-- <ToastMessages></ToastMessages> -->
-    <router-view v-if="status"/>
+    <toast-messages></toast-messages>
+    <router-view v-if="status" />
   </div>
 </template>
-
 <script>
-import Navbar from '@/components/Navbar.vue';
+import Navbar from "@/components/Navbar.vue";
+import ToastMessages from "@/components/ToastMessages.vue";
 export default {
   name: "Dashboard",
-  components: { Navbar },
+  components: { Navbar, ToastMessages },
   data() {
     return {
       status: false,
     };
   },
-  created() {
+  mounted() {
     this.checkLogin();
   },
   methods: {
@@ -25,20 +25,17 @@ export default {
         /(?:(?:^|.*;\s*)hexschool\s*=\s*([^;]*).*$)|^.*$/,
         "$1"
       );
-      if (token) {
-        this.$http.defaults.headers.common.Authorization = `${token}`;
-        this.$http
-          .post(`${import.meta.env.VITE_API}api/user/check`)
-            .then(() => {
-              this.status = true;
-            })
-            .catch((err) => {
-              alert(err.response.data.message);
-              this.$router.push('/');
-            });
-      }
+      this.$http.defaults.headers.common["Authorization"] = token;
+      this.$http
+        .post(`${import.meta.env.VITE_API}api/user/check`)
+        .then(() => {
+          this.status = true;
+        })
+        .catch((error) => {
+          this.$httpMessageState(error.response, '錯誤訊息');
+          this.$router.push("/");
+        });
     },
-
   },
 };
 </script>

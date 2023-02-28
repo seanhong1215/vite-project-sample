@@ -23,45 +23,19 @@
           aria-label="Close"
         ></button>
       </div>
-      <div class="toast-body" v-if="msg.content">
-        {{ msg.content }}
-      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapActions, mapState } from 'pinia'
-import { useToastMessageStore } from "../stores/toastMessage";
+import { useToastMessageStore } from "../store/toastMessage";
 export default {
-  // data() {
-  //   return {
-  //     messages: [],
-  //   };
-  // },
-  // inject: ['emitter'],
-  // methods: {
-  //   toastShow() {
-  //     setTimeout(() => {
-  //       this.messages.shift();
-  //     }, 6000);
-  //   },
-  //   clearToast(index) {
-  //     this.messages.splice(index, 1);
-  //   },
-  // },
   computed: {
     ...mapState(useToastMessageStore, ['messages'])
   },
   methods: {
     ...mapActions(useToastMessageStore, ['clearToast'])
   }
-  // mounted() {
-  //   this.emitter.on('push-message', (message) => {
-  //     const { style = 'success', title, content } = message;
-  //     this.messages.push({ style, title, content });
-  //     this.toastShow();
-  //   });
-  // },
 };
 </script>

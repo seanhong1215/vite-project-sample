@@ -1,18 +1,18 @@
 <template>
-  <Loading :active="isLoading" :z-index="1060"></Loading>
+  <Loading :active="isLoading" :z-index="1000"></Loading>
   <table class="table mt-4">
     <thead>
       <tr>
         <th>購買時間</th>
         <th>Email</th>
-        <th>購買款項</th> 
+        <th>購買款項</th>
         <th>應付金額</th>
         <th>是否付款</th>
         <th>編輯</th>
       </tr>
     </thead>
     <tbody>
-      <template v-for="(item, key) in orders" :key="key">
+      <template v-for="(item, id) in orders" :key="id">
         <tr v-if="orders.length" :class="{ 'text-secondary': !item.is_paid }">
           <td>{{ $filters.date(item.create_at) }}</td>
           <td><span v-text="item.user.email" v-if="item.user"></span></td>
@@ -70,12 +70,10 @@
   <DelModal :item="tempOrder" ref="delModal" @del-item="delOrder"></DelModal>
   <Pagination :pages="pagination" @emitPages="getOrders"></Pagination>
 </template>
-
 <script>
-import DelModal from '@/components/DelModal.vue';
-import OrderModal from '@/components/OrderModal.vue';
-import Pagination from '@/components/Pagination.vue';
-import { apiUpdateOrder, apiDelOrder } from '@/utils/api.js';
+import DelModal from "@/components/DelModal.vue";
+import OrderModal from "@/components/OrderModal.vue";
+import Pagination from "@/components/Pagination.vue";
 export default {
   data() {
     return {
@@ -95,17 +93,24 @@ export default {
   methods: {
     getOrders(currentPage = 1) {
       this.currentPage = currentPage;
-      const url = `${import.meta.env.VITE_API}/api/${import.meta.env.VITE_PATH}/admin/orders?page=${currentPage}`;
+      const url = `${import.meta.env.VITE_API}/api/${
+        import.meta.env.VITE_PATH
+      }/admin/orders?page=${currentPage}`;
       this.isLoading = true;
-      this.$http.get(url, this.tempProduct).then((response) => {
-        this.orders = response.data.orders;
-        this.pagination = response.data.pagination;
-        this.isLoading = false;
-      }).catch((error) => {
-        this.isLoading = false;
-        console.log(error.response, '錯誤訊息')
-        // this.$httpMessageState(error.response, '錯誤訊息');
-      });
+      this.$http
+        .get(url, this.tempProduct)
+        .then((res) => {
+          this.orders = res.data.orders;
+          this.pagination = res.data.pagination;
+          this.isLoading = false;
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          this.$swal.fire({
+            icon: "error",
+            title: err.response.data.message,
+          });
+        });
     },
     openModal(item) {
       this.tempOrder = { ...item };
@@ -120,37 +125,52 @@ export default {
     },
     updatePaid(item) {
       this.isLoading = true;
-      // const api = `${import.meta.env.VITE_API}/api/${import.meta.env.VITE_PATH}/admin/order/${item.id}`;
+      const api = `${import.meta.env.VITE_API}/api/${
+        import.meta.env.VITE_PATH
+      }/admin/order/${item.id}`;
       const paid = {
         is_paid: item.is_paid,
       };
-      
-      apiUpdateOrder(item.id, { data: paid }).then((response) => {
-        this.isLoading = false;
-        const orderComponent = this.$refs.orderModal;
-        orderComponent.hideModal();
-        this.getOrders(this.currentPage);
-        console.log(response, '更新付款狀態')
-        // this.$httpMessageState(response, '更新付款狀態');
-      }).catch((error) => {
-        this.isLoading = false;
-        console.log(error.response, '錯誤訊息')
-        // this.$httpMessageState(error.response, '錯誤訊息');
-      });
+      this.$http
+        .put(api, { data: paid })
+        .then(() => {
+          this.isLoading = false;
+          const orderComponent = this.$refs.orderModal;
+          orderComponent.hideModal();
+          this.getOrders(this.currentPage);
+          this.$swal.fire({
+            icon: "success",
+            title: "更新付款狀態",
+          });
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          this.$swal.fire({
+            icon: "error",
+            title: `錯誤訊息：${err.message}`,
+          });
+        });
     },
     delOrder() {
-      // const url = `${import.meta.env.VITE_API}/api/${import.meta.env.VITE_PATH}/admin/order/${this.tempOrder.id}`;
+      const api = `${import.meta.env.VITE_API}/api/${
+        import.meta.env.VITE_PATH
+      }/admin/order/${this.tempOrder.id}`;
       this.isLoading = true;
-      apiDelOrder(this.tempOrder.id).then(() => {
-        this.isLoading = false;
-        const delComponent = this.$refs.delModal;
-        delComponent.hideModal();
-        this.getOrders(this.currentPage);
-      }).catch((error) => {
-        this.isLoading = false;
-        console.log(error.response, '錯誤訊息')
-        // this.$httpMessageState(error.response, '錯誤訊息');
-      });
+      this.$http
+        .delete(api)
+        .then(() => {
+          this.isLoading = false;
+          const delComponent = this.$refs.delModal;
+          delComponent.hideModal();
+          this.getOrders(this.currentPage);
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          this.$swal.fire({
+            icon: "error",
+            title: `錯誤訊息：${err.message}`,
+          });
+        });
     },
   },
   created() {
