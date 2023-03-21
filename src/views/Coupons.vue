@@ -24,7 +24,7 @@
         <tr v-for="(item, key) in coupons" :key="key">
           <td>{{ item.title }}</td>
           <td>{{ item.percent }}%</td>
-          <td>{{ $filters.date(item.due_date) }}</td>
+          <td>{{ date(item.due_date) }}</td>
           <td>
             <span v-if="item.is_enabled === 1" class="text-success">啟用</span>
             <span v-else class="text-muted">未啟用</span>
@@ -78,6 +78,7 @@ export default {
       isNew: false,
     };
   },
+  inject: ['MessageState', 'date'],
   methods: {
     openCouponModal(isNew, item) {
       this.isNew = isNew;
@@ -108,10 +109,7 @@ export default {
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: err.response.data.message,
-          });
+          this.MessageState(err.response, '取得優惠券 API 資料');
         });
     },
     updateCoupon(tempCoupon) {
@@ -133,22 +131,14 @@ export default {
       this.$http[httpMethos](url, { data })
         .then((res) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "success",
-            title: res.data.message,
-          });
+          this.MessageState(res, `${status}優惠券`);
           this.getCoupons();
           this.$refs.couponModal.hideModal();
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal
-            .fire({
-              icon: "error",
-              title: `${status}產品失敗`,
-              html: `<p class="text-danger">${err.response.data.message}</p>`,
-            });
-        });
+          this.MessageState(err.response, `${status}優惠券`);
+      })
     },
     delCoupon() {
       const url = `${import.meta.env.VITE_API}/api/${
@@ -159,20 +149,14 @@ export default {
         .delete(url)
         .then((res) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "success",
-            title: res.data.message,
-          });
+          this.MessageState(res, '優惠券刪除');
           const delComponent = this.$refs.delModal;
           delComponent.hideModal();
           this.getCoupons();
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: err.response.data.message,
-          });
+          this.MessageState(err.response, '優惠券刪除');
         });
     },
   },

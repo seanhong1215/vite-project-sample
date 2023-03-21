@@ -92,6 +92,7 @@ export default {
       currentPage: 1,
     };
   },
+  inject: ['MessageState'],
   components: {
     Pagination,
     DelModal,
@@ -113,10 +114,7 @@ export default {
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: err.response.data.message,
-          });
+          this.MessageState(err.response, '取得產品 API 資料');
         });
     },
     openModal(isNew, item) {
@@ -144,19 +142,12 @@ export default {
       }
       this.$http[httpMethos](url, { data: this.tempProduct }).then((res) => {
         this.isLoading = false;
-        this.$swal.fire({
-            icon: "success",
-            title: res.data.message,
-          });
+        this.MessageState(res, `${status}產品`);
           productComponent.hideModal();
           this.getProducts(this.currentPage);
       }).catch((err) => {
         this.isLoading = false;
-        this.$swal.fire({
-            icon: "error",
-            title: `${status}產品失敗`,
-            html: `<p class="text-danger">${err.response.data.message}</p>`,
-          });
+        this.MessageState(err.response, `${status}產品`);
       });
     },
     openDelProductModal(item) {
@@ -172,22 +163,16 @@ export default {
             import.meta.env.VITE_PATH
           }/admin/product/${this.tempProduct.id}`
         )
-        .then(() => {
+        .then((res) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "success",
-            title: "刪除產品成功",
-          });
+        this.MessageState(res, '刪除產品');
           const delComponent = this.$refs.delModal;
           delComponent.hideModal();
           this.getProducts(this.currentPage);
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: err.response.data.message,
-          });
+        this.MessageState(err.response, '刪除產品');
         });
     },
   },

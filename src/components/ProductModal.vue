@@ -230,6 +230,7 @@ export default {
       tempProduct: {},
     };
   },
+  inject: ['MessageState'],
   emits: ['update-product'],
   mixins: [modalMixin],
   watch: {
@@ -259,18 +260,11 @@ export default {
         if (res.data.success) {
           this.tempProduct.imageUrl = res.data.imageUrl;
           this.$refs.fileInput.value = '';
-          this.$swal.fire({
-            icon: "success",
-            title: '圖片上傳結果',
-            text: res.data.message,
-          });
+          this.MessageState(res, '圖片上傳');
         }
       }).catch((err) => {
         this.status.fileUploading = false;
-        this.$swal.fire({
-            icon: "error",
-            title: `圖片失敗：${err.response.data.message}`,
-          });
+        this.MessageState(err.response, '圖片上傳');
       });
     },
   },

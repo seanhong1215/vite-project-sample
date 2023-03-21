@@ -11,6 +11,7 @@ import ToastMessages from "@/components/ToastMessages.vue";
 export default {
   name: "Dashboard",
   components: { Navbar, ToastMessages },
+  inject: ['MessageState'],
   data() {
     return {
       status: false,
@@ -32,7 +33,7 @@ export default {
           this.status = true;
         })
         .catch((error) => {
-          this.$httpMessageState(error.response, '錯誤訊息');
+          this.MessageState(error.response, '錯誤訊息');
           this.$router.push("/");
         });
     },

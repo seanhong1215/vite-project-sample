@@ -46,6 +46,7 @@ export default {
   components: {
     ToastMessages,
   },
+  inject: ['MessageState'],
   data() {
     return {
       isLoading: false,
@@ -66,22 +67,12 @@ export default {
             const { token, expired } = response.data;
             document.cookie = `hexschool=${token}; expires=${new Date(expired)};`;
             this.isLoading = false;
-            if (token) {
-              this.$swal.fire(
-                  '登入成功!',
-                  '即將進入產品頁面',
-                  'success'
-                ).then((result) => {
-                  if (result.isConfirmed) {
-                  this.$router.push("/admin/products");
-                }
-              })
+            this.$router.push("/admin/products");
             }
-          }
         })
         .catch((error) => {
           this.isLoading = false;
-          this.$httpMessageState(error.response, '登入');
+          this.MessageState(error.response, '登入失敗');
         });
     },
   },

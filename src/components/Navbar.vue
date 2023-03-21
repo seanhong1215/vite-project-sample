@@ -21,6 +21,7 @@
 </template>
 <script>
 export default {
+  inject: ['MessageState'],
   methods: {
     signout() {
       const api = `${import.meta.env.VITE_API}/logout`;
@@ -31,11 +32,7 @@ export default {
             }
         })
         .catch((err) => {
-          this.$swal.fire(
-                `${err.response.data.message}!!!`,
-                '錯誤訊息',
-                'error'
-            )
+          this.MessageState(err.response, '登出');
         });
     },
   },

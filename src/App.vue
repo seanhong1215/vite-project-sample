@@ -3,7 +3,18 @@
 </template>
 
 <script>
-export default {};
+import MessageState from '@/methods/pushMessageState.js';
+import {date, currency} from '@/methods/filters.js';
+
+export default {
+  provide(){
+    return {
+      MessageState,
+      date,
+      currency
+    }
+  }
+};
 </script>
 
 <style lang="scss">

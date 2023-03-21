@@ -14,7 +14,7 @@
     <tbody>
       <template v-for="(item, id) in orders" :key="id">
         <tr v-if="orders.length" :class="{ 'text-secondary': !item.is_paid }">
-          <td>{{ $filters.date(item.create_at) }}</td>
+          <td>{{ date(item.create_at) }}</td>
           <td><span v-text="item.user.email" v-if="item.user"></span></td>
           <td>
             <ul class="list-unstyled">
@@ -85,6 +85,7 @@ export default {
       currentPage: 1,
     };
   },
+  inject: ['MessageState', 'date'],
   components: {
     Pagination,
     DelModal,
@@ -106,10 +107,7 @@ export default {
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: err.response.data.message,
-          });
+        this.MessageState(err.response, '取得訂單 API 資料');
         });
     },
     openModal(item) {
@@ -133,22 +131,16 @@ export default {
       };
       this.$http
         .put(api, { data: paid })
-        .then(() => {
+        .then((res) => {
           this.isLoading = false;
           const orderComponent = this.$refs.orderModal;
           orderComponent.hideModal();
           this.getOrders(this.currentPage);
-          this.$swal.fire({
-            icon: "success",
-            title: "更新付款狀態",
-          });
+          this.MessageState(res, '更新付款狀態');
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: `錯誤訊息：${err.message}`,
-          });
+          this.MessageState(err.response, '更新付款狀態');
         });
     },
     delOrder() {
@@ -158,18 +150,16 @@ export default {
       this.isLoading = true;
       this.$http
         .delete(api)
-        .then(() => {
+        .then((res) => {
           this.isLoading = false;
           const delComponent = this.$refs.delModal;
           delComponent.hideModal();
           this.getOrders(this.currentPage);
+          this.MessageState(res, '刪除訂單');
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: `錯誤訊息：${err.message}`,
-          });
+          this.MessageState(err.response, '刪除訂單');
         });
     },
   },

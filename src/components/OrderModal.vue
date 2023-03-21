@@ -56,13 +56,13 @@
                   </tr>
                   <tr>
                     <th>下單時間</th>
-                    <td>{{ $filters.date(tempOrder.create_at) }}</td>
+                    <td>{{ date(tempOrder.create_at) }}</td>
                   </tr>
                   <tr>
                     <th>付款時間</th>
                     <td>
                       <span v-if="tempOrder.paid_date">
-                        {{ $filters.date(tempOrder.paid_date) }}
+                        {{ date(tempOrder.paid_date) }}
                       </span>
                       <span v-else>時間不正確</span>
                     </td>
@@ -79,7 +79,7 @@
                   <tr>
                     <th>總金額</th>
                     <td>
-                      {{ $filters.currency(tempOrder.total) }}
+                      {{ currency(tempOrder.total) }}
                     </td>
                   </tr>
                 </tbody>
@@ -96,7 +96,7 @@
                     </th>
                     <td>{{ item.qty }} / {{ item.product.unit }}</td>
                     <td class="text-end">
-                      {{ $filters.currency(item.final_total) }}
+                      {{ currency(item.final_total) }}
                     </td>
                   </tr>
                 </tbody>
@@ -156,6 +156,7 @@ export default {
       isPaid: false,
     };
   },
+  inject: ['date','currency'],
   emits: ['update-paid'],
   mixins: [modalMixin],
   watch: {

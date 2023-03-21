@@ -22,7 +22,7 @@
           <td>{{ article.title }}</td>
           <td>{{ article.author }}</td>
           <td>{{ article.description }}</td>
-          <td>{{ $filters.date(article.create_at) }}</td>
+          <td>{{ date(article.create_at) }}</td>
           <td>
             <span v-if="article.isPublic">已上架</span>
             <span v-else>未上架</span>
@@ -71,6 +71,7 @@ export default {
       currentPage: 1,
     };
   },
+  inject: ['MessageState', 'date'],
   components: {
     ArticleModal,
     DelModal,
@@ -93,10 +94,7 @@ export default {
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: `連線錯誤${err.response.data.message}`,
-          });
+          this.MessageState(err.response, '取得文章 API 資料');
         });
     },
     getArticle(id) {
@@ -115,10 +113,7 @@ export default {
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: `連線錯誤${err.response.data.message}`,
-          });
+          this.MessageState(err.response, '編輯文章 API 資料');
         });
     },
     openModal(isNew, item) {
@@ -154,21 +149,13 @@ export default {
       this.$http[httpMethod](api, { data: this.tempArticle })
         .then((res) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "success",
-            title: res.data.message,
-          });
+          this.MessageState(res, `${status}文章`);
           articleComponent.hideModal();
           this.getArticles(this.currentPage);
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal
-            .fire({
-              icon: "error",
-              title: `${status}文章失敗`,
-              html: `<p class="text-danger">${err.response.data.message}</p>`,
-            });
+          this.MessageState(err.response, `${status}文章`);
         });
     },
     openDelArticleModal(item) {
@@ -185,20 +172,14 @@ export default {
         .delete(url)
         .then((res) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "success",
-            title: res.data.message,
-          });
+          this.MessageState(res, '刪除文章');
           const delComponent = this.$refs.delModal;
           delComponent.hideModal();
           this.getArticles(this.currentPage);
         })
         .catch((err) => {
           this.isLoading = false;
-          this.$swal.fire({
-            icon: "error",
-            title: err.response.data.message,
-          });
+          this.MessageState(err.response, '刪除文章');
         });
     },
   },
